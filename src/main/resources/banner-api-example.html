@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banner API调用示例</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .example { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+        .result { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Banner API调用示例</h1>
+    <p>接口地址: <strong>http://localhost:8081/api/banners</strong></p>
+    <p>请求方式: <strong>GET</strong></p>
+    
+    <!-- 原生JavaScript fetch示例 -->
+    <div class="example">
+        <h2>1. 原生JavaScript fetch API</h2>
+        <button onclick="fetchBannerData()">调用API</button>
+        <div class="result" id="fetchResult"></div>
+    </div>
+    
+    <!-- jQuery ajax示例 -->
+    <div class="example">
+        <h2>2. jQuery ajax</h2>
+        <button onclick="jqueryAjax()">调用API</button>
+        <div class="result" id="jqueryResult"></div>
+    </div>
+    
+    <!-- Axios示例 -->
+    <div class="example">
+        <h2>3. Axios</h2>
+        <button onclick="axiosRequest()">调用API</button>
+        <div class="result" id="axiosResult"></div>
+    </div>
+    
+    <!-- Vue.js示例 -->
+    <div class="example">
+        <h2>4. Vue.js (假设已引入Vue和Axios)</h2>
+        <div id="app">
+            <button @click="getBannerData">调用API</button>
+            <div class="result">
+                <pre v-if="banners.length > 0">{{ JSON.stringify(banners, null, 2) }}</pre>
+                <p v-else-if="error">{{ error }}</p>
+                <p v-else>未调用API</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- React示例 -->
+    <div class="example">
+        <h2>5. React (函数组件)</h2>
+        <pre>
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function BannerComponent() {
+    const [banners, setBanners] = useState([]);
+    const [error, setError] = useState(null);
+
+    const fetchBanners = async () => {
+        try {
+            const response = await axios.get('http://localhost:8081/api/banners');
+            setBanners(response.data);
+            setError(null);
+        } catch (err) {
+            setError('获取数据失败: ' + err.message);
+            setBanners([]);
+        }
+    };
+
+    useEffect(() => {
+        // 组件挂载时自动调用
+        fetchBanners();
+    }, []);
+
+    return (
+        <div>
+            <button onClick={fetchBanners}>刷新Banner数据</button>
+            {error && <div style={{color: 'red'}}>{error}</div>}
+            <div>
+                {banners.map(banner => (
+                    <div key={banner.id}>
+                        <h3>{banner.title}</h3>
+                        <img src={banner.image} alt={banner.title} style={{maxWidth: '300px'}} />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+export default BannerComponent;
+        </pre>
+    </div>
+
+    <script>
+        // 1. 原生JavaScript fetch API
+        function fetchBannerData() {
+            const resultDiv = document.getElementById('fetchResult');
+            resultDiv.innerHTML = '<p>加载中...</p>';
+            
+            fetch('http://localhost:8081/api/banners')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('网络响应错误: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    resultDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = '<p style="color: red;">获取数据失败: ' + error.message + '</p>';
+                });
+        }
+        
+        // 2. jQuery ajax
+        function jqueryAjax() {
+            const resultDiv = document.getElementById('jqueryResult');
+            resultDiv.html('<p>加载中...</p>');
+            
+            $.ajax({
+                url: 'http://localhost:8081/api/banners',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    resultDiv.html('<pre>' + JSON.stringify(data, null, 2) + '</pre>');
+                },
+                error: function(xhr, status, error) {
+                    resultDiv.html('<p style="color: red;">获取数据失败: ' + error + '</p>');
+                }
+            });
+        }
+        
+        // 3. Axios
+        function axiosRequest() {
+            const resultDiv = document.getElementById('axiosResult');
+            resultDiv.innerHTML = '<p>加载中...</p>';
+            
+            axios.get('http://localhost:8081/api/banners')
+                .then(response => {
+                    resultDiv.innerHTML = '<pre>' + JSON.stringify(response.data, null, 2) + '</pre>';
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = '<p style="color: red;">获取数据失败: ' + error.message + '</p>';
+                });
+        }
+        
+        // 4. Vue.js示例
+        new Vue({
+            el: '#app',
+            data: {
+                banners: [],
+                error: null
+            },
+            methods: {
+                getBannerData() {
+                    this.error = null;
+                    axios.get('http://localhost:8081/api/banners')
+                        .then(response => {
+                            this.banners = response.data;
+                        })
+                        .catch(error => {
+                            this.error = '获取数据失败: ' + error.message;
+                        });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

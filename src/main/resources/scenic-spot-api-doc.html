@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>景点接口文档</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 30px; }
+        .endpoint { background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .method { display: inline-block; background: #4CAF50; color: white; padding: 5px 10px; border-radius: 3px; margin-right: 10px; }
+        .url { font-family: monospace; font-size: 16px; }
+        .response { background: #e8f5e9; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .field { margin: 10px 0; }
+        .field-name { font-weight: bold; display: inline-block; width: 100px; }
+        .field-type { color: #666; font-style: italic; }
+        .example { margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>景点接口文档</h1>
+        
+        <div class="endpoint">
+            <h2>获取所有景点信息</h2>
+            <div>
+                <span class="method">GET</span>
+                <span class="url">http://localhost:8081/api/scenic-spots</span>
+            </div>
+        </div>
+        
+        <h2>接口说明</h2>
+        <p>该接口用于获取数据库中所有景点的详细信息，返回一个包含所有景点对象的JSON数组。</p>
+        
+        <h2>返回数据结构</h2>
+        <p>返回一个ScenicSpot对象数组，每个对象包含以下字段：</p>
+        <div class="field">
+            <span class="field-name">id</span>
+            <span class="field-type">Integer</span>
+            <span>景点ID（主键，自增）</span>
+        </div>
+        <div class="field">
+            <span class="field-name">title</span>
+            <span class="field-type">String</span>
+            <span>景点名称</span>
+        </div>
+        <div class="field">
+            <span class="field-name">img</span>
+            <span class="field-type">String</span>
+            <span>景点图片URL</span>
+        </div>
+        <div class="field">
+            <span class="field-name">introduce</span>
+            <span class="field-type">String</span>
+            <span>景点介绍</span>
+        </div>
+        <div class="field">
+            <span class="field-name">address</span>
+            <span class="field-type">String</span>
+            <span>景点地址</span>
+        </div>
+        <div class="field">
+            <span class="field-name">tag</span>
+            <span class="field-type">String</span>
+            <span>景点标签（如：自然风光、历史文化等）</span>
+        </div>
+        <div class="field">
+            <span class="field-name">times</span>
+            <span class="field-type">String</span>
+            <span>开放时间</span>
+        </div>
+        
+        <h2>返回示例</h2>
+        <div class="response">
+            <pre>[
+    {
+        "id": 1,
+        "title": "故宫博物院",
+        "img": "http://example.com/gugong.jpg",
+        "introduce": "故宫博物院是中国明清两代的皇家宫殿...",
+        "address": "北京市东城区景山前街4号",
+        "tag": "历史文化,世界遗产",
+        "times": "08:30-17:00"
+    },
+    {
+        "id": 2,
+        "title": "长城",
+        "img": "http://example.com/greatwall.jpg",
+        "introduce": "万里长城是中国古代的军事防御工程...",
+        "address": "北京市延庆区八达岭",
+        "tag": "历史文化,自然风光,世界遗产",
+        "times": "07:30-18:30"
+    }
+]</pre>
+        </div>
+        
+        <h2>前端调用示例</h2>
+        
+        <div class="example">
+            <h3>1. 原生JavaScript (Fetch API)</h3>
+            <pre>fetch('http://localhost:8081/api/scenic-spots')
+    .then(response => response.json())
+    .then(scenicSpots => {
+        console.log('景点数据:', scenicSpots);
+        // 处理景点数据
+    })
+    .catch(error => {
+        console.error('获取景点数据失败:', error);
+    });</pre>
+        </div>
+        
+        <div class="example">
+            <h3>2. Axios</h3>
+            <pre>axios.get('http://localhost:8081/api/scenic-spots')
+    .then(response => {
+        const scenicSpots = response.data;
+        console.log('景点数据:', scenicSpots);
+        // 处理景点数据
+    })
+    .catch(error => {
+        console.error('获取景点数据失败:', error);
+    });</pre>
+        </div>
+        
+        <div class="example">
+            <h3>3. Vue.js</h3>
+            <pre>&lt;template&gt;
+    &lt;div class="scenic-spots"&gt;
+        &lt;div v-for="spot in scenicSpots" :key="spot.id" class="spot-item"&gt;
+            &lt;h3&gt;{{ spot.title }}&lt;/h3&gt;
+            &lt;img :src="spot.img" :alt="spot.title"&gt;
+            &lt;p&gt;{{ spot.introduce }}&lt;/p&gt;
+            &lt;p&gt;地址: {{ spot.address }}&lt;/p&gt;
+            &lt;p&gt;标签: {{ spot.tag }}&lt;/p&gt;
+            &lt;p&gt;开放时间: {{ spot.times }}&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+import axios from 'axios';
+
+export default {
+    data() {
+        return {
+            scenicSpots: []
+        };
+    },
+    mounted() {
+        this.fetchScenicSpots();
+    },
+    methods: {
+        fetchScenicSpots() {
+            axios.get('http://localhost:8081/api/scenic-spots')
+                .then(response => {
+                    this.scenicSpots = response.data;
+                })
+                .catch(error => {
+                    console.error('获取景点数据失败:', error);
+                });
+        }
+    }
+};
+&lt;/script&gt;</pre>
+        </div>
+        
+        <div class="example">
+            <h3>4. React</h3>
+            <pre>import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function ScenicSpotList() {
+    const [scenicSpots, setScenicSpots] = useState([]);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        axios.get('http://localhost:8081/api/scenic-spots')
+            .then(response => {
+                setScenicSpots(response.data);
+                setError(null);
+            })
+            .catch(err => {
+                setError('获取景点数据失败: ' + err.message);
+                setScenicSpots([]);
+            });
+    }, []);
+
+    if (error) {
+        return <div style={{color: 'red'}}>{error}</div>;
+    }
+
+    return (
+        <div className="scenic-spots-container">
+            <h2>景点列表</h2>
+            <div className="scenic-spots-grid">
+                {scenicSpots.map(spot => (
+                    <div key={spot.id} className="scenic-spot-card">
+                        <h3>{spot.title}</h3>
+                        <img src={spot.image} alt={spot.title} className="spot-image" />
+                        <p className="spot-address">{spot.address}</p>
+                        <p className="spot-tags">{spot.tags}</p>
+                        <p className="spot-time">开放时间: {spot.times}</p>
+                        <p className="spot-intro">{spot.introduce.substring(0, 100)}...</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+export default ScenicSpotList;</pre>
+        </div>
+    </div>
+</body>
+</html>
