@@ -1,6 +1,7 @@
 package com.example.tourismblack.entity;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "scenic_spots")
@@ -12,8 +13,11 @@ public class ScenicSpot {
     private String img;
     private String introduce;
     private String address;
-    private String tag;
     private String times;
+
+    @ManyToMany
+    @JoinTable(name = "scenic_spot_tags", joinColumns = @JoinColumn(name = "scenic_spot_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    private Set<Tag> tags;
 
     // getter和setter方法
     public Integer getId() {
@@ -56,20 +60,20 @@ public class ScenicSpot {
         this.address = address;
     }
 
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
     public String getTimes() {
         return times;
     }
 
     public void setTimes(String times) {
         this.times = times;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 
     @Override
@@ -80,8 +84,8 @@ public class ScenicSpot {
                 ", img='" + img + '\'' +
                 ", introduce='" + introduce + '\'' +
                 ", address='" + address + '\'' +
-                ", tag='" + tag + '\'' +
                 ", times='" + times + '\'' +
+                ", tags=" + tags +
                 '}';
     }
 }
