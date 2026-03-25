@@ -10,11 +10,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String openid;
+    @Column(name = "session_key")
     private String sessionKey;
     @Column(name = "create_time", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createTime;
     @Column(name = "update_time", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updateTime;
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+    @Column(name = "nick_name")
+    private String nickName;
 
     public Integer getId() {
         return id;
@@ -56,6 +61,22 @@ public class User {
         this.updateTime = updateTime;
     }
 
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -64,6 +85,8 @@ public class User {
                 ", sessionKey='" + sessionKey + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
+                ", avatarUrl='" + avatarUrl + '\'' +
+                ", nickName='" + nickName + '\'' +
                 '}';
     }
 }
