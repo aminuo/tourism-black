@@ -91,4 +91,100 @@ public class LoginController {
             return ResponseResult.error(500, errorData);
         }
     }
+
+    @GetMapping("/getUserInfo")
+    public ResponseResult<Map<String, Object>> getUserInfo(@RequestHeader("token") String token) {
+        try {
+            // 验证token
+            if (!JWTUtil.validateToken(token)) {
+                Map<String, Object> errorData = new HashMap<>();
+                errorData.put("message", "token无效或已过期");
+                return ResponseResult.error(401, errorData);
+            }
+
+            // 从token中提取openid
+            String openid = JWTUtil.getOpenidFromToken(token);
+            if (openid == null) {
+                Map<String, Object> errorData = new HashMap<>();
+                errorData.put("message", "无法从token中获取openid");
+                return ResponseResult.error(401, errorData);
+            }
+
+            // 根据openid查询用户信息
+            User user = userRepository.findByOpenid(openid);
+            if (user == null) {
+                Map<String, Object> errorData = new HashMap<>();
+                errorData.put("message", "用户不存在");
+                return ResponseResult.error(404, errorData);
+            }
+
+            // 返回用户信息
+            Map<String, Object> result = new HashMap<>();
+            result.put("id", user.getId());
+            result.put("openid", user.getOpenid());
+            result.put("avatarUrl", user.getAvatarUrl());
+            result.put("nickName", user.getNickName());
+
+            return ResponseResult.success(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("message", "获取用户信息失败：" + e.getMessage());
+            return ResponseResult.error(500, errorData);
+        }
+    }
+
+    @PostMapping("/updateUserInfo")
+    public ResponseResult<Map<String, Object>> updateUserInfo(@RequestHeader("token") String token,
+            @RequestBody Map<String, String> request) {
+        try {
+            // 验证token
+            if (!JWTUtil.validateToken(token)) {
+                Map<String, Object> errorData = new HashMap<>();
+                errorData.put("message", "token无效或已过期");
+                return ResponseResult.error(401, errorData);
+            }
+
+            // 从token中提取openid
+            String openid = JWTUtil.getOpenidFromToken(token);
+            if (openid == null) {
+                Map<String, Object> errorData = new HashMap<>();
+                errorData.put("message", "无法从token中获取openid");
+                return ResponseResult.error(401, errorData);
+            }
+
+            // 根据openid查询用户信息
+            User user = userRepository.findByOpenid(openid);
+            if (user == null) {
+                Map<String, Object> errorData = new HashMap<>();
+                errorData.put("message", "用户不存在");
+                return ResponseResult.error(404, errorData);
+            }
+
+            // 更新用户信息
+            if (request.containsKey("avatarUrl")) {
+                user.setAvatarUrl(request.get("avatarUrl"));
+            }
+            if (request.containsKey("nickName")) {
+                user.setNickName(request.get("nickName"));
+            }
+
+            // 保存更新后的用户信息
+            userRepository.save(user);
+
+            // 返回更新后的用户信息
+            Map<String, Object> result = new HashMap<>();
+            result.put("id", user.getId());
+            result.put("openid", user.getOpenid());
+            result.put("avatarUrl", user.getAvatarUrl());
+            result.put("nickName", user.getNickName());
+
+            return ResponseResult.success(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("message", "更新用户信息失败：" + e.getMessage());
+            return ResponseResult.error(500, errorData);
+        }
+    }
 }
