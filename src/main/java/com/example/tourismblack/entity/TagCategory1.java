@@ -1,19 +1,17 @@
 package com.example.tourismblack.entity;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tags")
-public class Tag {
+@Table(name = "tag_category1")
+public class TagCategory1 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
-    @Column(name = "create_time", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createTime;
+    private Integer sort;
+    private String code;
 
-    // getter和setter方法
     public Integer getId() {
         return id;
     }
@@ -30,20 +28,29 @@ public class Tag {
         this.name = name;
     }
 
-    public LocalDateTime getCreateTime() {
-        return createTime;
+    public Integer getSort() {
+        return sort;
     }
 
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     @Override
     public String toString() {
-        return "Tag{" +
+        return "TagCategory1{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", createTime=" + createTime +
+                ", sort=" + sort +
+                ", code='" + code + '\'' +
                 '}';
     }
 }
