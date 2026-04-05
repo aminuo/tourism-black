@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface TagCategory3Repository extends JpaRepository<TagCategory3, Integer> {
-    List<TagCategory3> findByC2Id(Integer c2Id);
+    List<TagCategory3> findByC2Code(String c2Code);
+
     Optional<TagCategory3> findByCode(String code);
 }

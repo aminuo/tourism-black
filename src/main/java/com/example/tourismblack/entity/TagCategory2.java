@@ -8,8 +8,8 @@ public class TagCategory2 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "c1_id")
-    private Integer c1Id;
+    @Column(name = "c1_code")
+    private String c1Code;
     private String name;
     private Integer sort;
     private String code;
@@ -22,12 +22,12 @@ public class TagCategory2 {
         this.id = id;
     }
 
-    public Integer getC1Id() {
-        return c1Id;
+    public String getC1Code() {
+        return c1Code;
     }
 
-    public void setC1Id(Integer c1Id) {
-        this.c1Id = c1Id;
+    public void setC1Code(String c1Code) {
+        this.c1Code = c1Code;
     }
 
     public String getName() {
@@ -58,7 +58,7 @@ public class TagCategory2 {
     public String toString() {
         return "TagCategory2{" +
                 "id=" + id +
-                ", c1Id=" + c1Id +
+                ", c1Code='" + c1Code + '\'' +
                 ", name='" + name + '\'' +
                 ", sort=" + sort +
                 ", code='" + code + '\'' +

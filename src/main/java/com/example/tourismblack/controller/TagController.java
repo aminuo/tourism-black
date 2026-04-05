@@ -57,24 +57,24 @@ public class TagController {
                 category1Map.put("sort", category1.getSort());
 
                 // 获取二级分类
-                List<TagCategory2> category2List = tagCategory2Repository.findByC1Id(category1.getId());
+                List<TagCategory2> category2List = tagCategory2Repository.findByC1Code(category1.getCode());
                 List<Map<String, Object>> category2s = new java.util.ArrayList<>();
                 for (TagCategory2 category2 : category2List) {
                     Map<String, Object> category2Map = new HashMap<>();
                     category2Map.put("id", category2.getId());
                     category2Map.put("code", category2.getCode());
-                    category2Map.put("c1Id", category2.getC1Id());
+                    category2Map.put("c1Code", category2.getC1Code());
                     category2Map.put("name", category2.getName());
                     category2Map.put("sort", category2.getSort());
 
                     // 获取三级分类
-                    List<TagCategory3> category3List = tagCategory3Repository.findByC2Id(category2.getId());
+                    List<TagCategory3> category3List = tagCategory3Repository.findByC2Code(category2.getCode());
                     List<Map<String, Object>> category3s = new java.util.ArrayList<>();
                     for (TagCategory3 category3 : category3List) {
                         Map<String, Object> category3Map = new HashMap<>();
                         category3Map.put("id", category3.getId());
                         category3Map.put("code", category3.getCode());
-                        category3Map.put("c2Id", category3.getC2Id());
+                        category3Map.put("c2Code", category3.getC2Code());
                         category3Map.put("name", category3.getName());
                         category3Map.put("sort", category3.getSort());
                         category3s.add(category3Map);

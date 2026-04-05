@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface TagCategory2Repository extends JpaRepository<TagCategory2, Integer> {
-    List<TagCategory2> findByC1Id(Integer c1Id);
+    List<TagCategory2> findByC1Code(String c1Code);
 }

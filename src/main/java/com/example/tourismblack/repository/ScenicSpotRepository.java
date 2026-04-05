@@ -29,19 +29,19 @@ public interface ScenicSpotRepository extends JpaRepository<ScenicSpot, Integer>
                         @Param("propertyId") Integer propertyId);
 
         // 通过一级标签ID搜索景点
-        @Query(value = "SELECT DISTINCT s.* FROM scenic_spots s JOIN scenic_tag3 st3 ON s.id = st3.scenic_id JOIN tag_category3 c3 ON st3.tag3_code = c3.code JOIN tag_category2 c2 ON c3.c2_id = c2.id JOIN tag_category1 c1 ON c2.c1_id = c1.id WHERE c1.id = :c1Id", nativeQuery = true)
+        @Query(value = "SELECT DISTINCT s.* FROM scenic_spots s JOIN scenic_tag3 st3 ON s.id = st3.scenic_id JOIN tag_category3 c3 ON st3.tag3_code = c3.code JOIN tag_category2 c2 ON c3.c2_code = c2.code JOIN tag_category1 c1 ON c2.c1_code = c1.code WHERE c1.id = :c1Id", nativeQuery = true)
         List<ScenicSpot> findByC1Id(@Param("c1Id") Integer c1Id);
 
         // 通过二级标签ID搜索景点
-        @Query(value = "SELECT DISTINCT s.* FROM scenic_spots s JOIN scenic_tag3 st3 ON s.id = st3.scenic_id JOIN tag_category3 c3 ON st3.tag3_code = c3.code JOIN tag_category2 c2 ON c3.c2_id = c2.id WHERE c2.id = :c2Id", nativeQuery = true)
+        @Query(value = "SELECT DISTINCT s.* FROM scenic_spots s JOIN scenic_tag3 st3 ON s.id = st3.scenic_id JOIN tag_category3 c3 ON st3.tag3_code = c3.code JOIN tag_category2 c2 ON c3.c2_code = c2.code WHERE c2.id = :c2Id", nativeQuery = true)
         List<ScenicSpot> findByC2Id(@Param("c2Id") Integer c2Id);
 
         // 通过标题和一级标签ID搜索景点
-        @Query(value = "SELECT DISTINCT s.* FROM scenic_spots s JOIN scenic_tag3 st3 ON s.id = st3.scenic_id JOIN tag_category3 c3 ON st3.tag3_code = c3.code JOIN tag_category2 c2 ON c3.c2_id = c2.id JOIN tag_category1 c1 ON c2.c1_id = c1.id WHERE s.title LIKE %:title% AND c1.id = :c1Id", nativeQuery = true)
+        @Query(value = "SELECT DISTINCT s.* FROM scenic_spots s JOIN scenic_tag3 st3 ON s.id = st3.scenic_id JOIN tag_category3 c3 ON st3.tag3_code = c3.code JOIN tag_category2 c2 ON c3.c2_code = c2.code JOIN tag_category1 c1 ON c2.c1_code = c1.code WHERE s.title LIKE %:title% AND c1.id = :c1Id", nativeQuery = true)
         List<ScenicSpot> findByTitleContainingAndC1Id(@Param("title") String title, @Param("c1Id") Integer c1Id);
 
         // 通过标题和二级标签ID搜索景点
-        @Query(value = "SELECT DISTINCT s.* FROM scenic_spots s JOIN scenic_tag3 st3 ON s.id = st3.scenic_id JOIN tag_category3 c3 ON st3.tag3_code = c3.code JOIN tag_category2 c2 ON c3.c2_id = c2.id WHERE s.title LIKE %:title% AND c2.id = :c2Id", nativeQuery = true)
+        @Query(value = "SELECT DISTINCT s.* FROM scenic_spots s JOIN scenic_tag3 st3 ON s.id = st3.scenic_id JOIN tag_category3 c3 ON st3.tag3_code = c3.code JOIN tag_category2 c2 ON c3.c2_code = c2.code WHERE s.title LIKE %:title% AND c2.id = :c2Id", nativeQuery = true)
         List<ScenicSpot> findByTitleContainingAndC2Id(@Param("title") String title, @Param("c2Id") Integer c2Id);
 
         // 通过属性标签ID搜索景点
