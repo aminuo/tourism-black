@@ -6,17 +6,23 @@ import com.example.tourismblack.entity.TagCategory3;
 import com.example.tourismblack.entity.TagProperty;
 import com.example.tourismblack.entity.ScenicTag3;
 import com.example.tourismblack.entity.ScenicTagProperty;
+import com.example.tourismblack.entity.SearchHistory;
+import com.example.tourismblack.entity.User;
 import com.example.tourismblack.repository.ScenicSpotRepository;
 import com.example.tourismblack.repository.ScenicTag3Repository;
 import com.example.tourismblack.repository.ScenicTagPropertyRepository;
 import com.example.tourismblack.repository.TagCategory3Repository;
 import com.example.tourismblack.repository.TagPropertyRepository;
+import com.example.tourismblack.repository.SearchHistoryRepository;
+import com.example.tourismblack.repository.UserRepository;
+import com.example.tourismblack.utils.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -45,17 +51,25 @@ public class ScenicSpotController {
     @Autowired
     private TagPropertyRepository tagPropertyRepository;
 
+    @Autowired
+    private SearchHistoryRepository searchHistoryRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
     /**
      * 查询景点数据，支持按名称和标签查询
      * 
      * @param title   景点名称
      * @param tagCode 标签编码（格式：类型前缀_实际ID，如C1_1、C2_1、C3_1、P_1）
+     * @param token   用户token（可选）
      * @return 景点列表
      */
     @GetMapping
     public ResponseResult<List<Map<String, Object>>> getAllScenicSpots(
             @RequestParam(value = "title", required = false) String title,
-            @RequestParam(value = "tagCode", required = false) String tagCode) {
+            @RequestParam(value = "tagCode", required = false) String tagCode,
+            @RequestHeader(value = "token", required = false) String token) {
         List<ScenicSpot> scenicSpots;
 
         // 根据标签编码前缀判断标签类型
@@ -105,6 +119,38 @@ public class ScenicSpotController {
         } else {
             // 查询所有
             scenicSpots = scenicSpotRepository.findAll();
+        }
+
+        // 保存搜索历史（如果有搜索关键词且用户已登录）
+        if (title != null && !title.isEmpty() && token != null) {
+            try {
+                // 验证token
+                if (JWTUtil.validateToken(token)) {
+                    // 从token中提取openid
+                    String openid = JWTUtil.getOpenidFromToken(token);
+                    if (openid != null) {
+                        // 根据openid查询用户
+                        User user = userRepository.findByOpenid(openid);
+                        if (user != null) {
+                            // 检查是否已存在相同的搜索记录
+                            SearchHistory existingHistory = searchHistoryRepository.findByUserIdAndKeyword(user.getId(),
+                                    title);
+                            if (existingHistory != null) {
+                                // 如果已存在，删除旧记录
+                                searchHistoryRepository.delete(existingHistory);
+                            }
+                            // 创建新的搜索历史记录
+                            SearchHistory searchHistory = new SearchHistory();
+                            searchHistory.setUserId(user.getId());
+                            searchHistory.setKeyword(title);
+                            searchHistoryRepository.save(searchHistory);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // 搜索历史保存失败不影响搜索结果
+                e.printStackTrace();
+            }
         }
 
         // 构建返回数据，包含标签信息
