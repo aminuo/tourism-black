@@ -60,64 +60,68 @@ public class ScenicSpotController {
     /**
      * 查询景点数据，支持按名称和标签查询
      * 
-     * @param title   景点名称
-     * @param tagCode 标签编码（格式：类型前缀_实际ID，如C1_1、C2_1、C3_1、P_1）
-     * @param token   用户token（可选）
+     * @param title        景点名称
+     * @param tagCode      标签编码（格式：类型前缀_实际ID，如C1_1、C2_1，用于一级和二级标签）
+     * @param c3Code       三级标签code（C3_xxx格式）
+     * @param propertyCode 属性标签code（P_xxx格式）
+     * @param token        用户token（可选）
      * @return 景点列表
      */
     @GetMapping
     public ResponseResult<List<Map<String, Object>>> getAllScenicSpots(
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "tagCode", required = false) String tagCode,
+            @RequestParam(value = "c3Code", required = false) String c3Code,
+            @RequestParam(value = "propertyCode", required = false) String propertyCode,
             @RequestHeader(value = "token", required = false) String token) {
         List<ScenicSpot> scenicSpots;
 
-        // 根据标签编码前缀判断标签类型
-        if (title != null && tagCode != null) {
-            // 按标题和标签查询
-            if (tagCode.startsWith("C1_")) {
-                // 一级标签
-                Integer id = Integer.parseInt(tagCode.substring(3));
-                scenicSpots = scenicSpotRepository.findByTitleContainingAndC1Id(title, id);
-            } else if (tagCode.startsWith("C2_")) {
-                // 二级标签
-                Integer id = Integer.parseInt(tagCode.substring(3));
-                scenicSpots = scenicSpotRepository.findByTitleContainingAndC2Id(title, id);
-            } else if (tagCode.startsWith("C3_")) {
-                // 三级标签
-                scenicSpots = scenicSpotRepository.findByTitleContainingAndTag3Code(title, tagCode);
-            } else if (tagCode.startsWith("P_")) {
-                // 属性标签
-                scenicSpots = scenicSpotRepository.findByTitleContainingAndPropertyCode(title, tagCode);
+        boolean hasC3 = c3Code != null && !c3Code.isEmpty();
+        boolean hasProperty = propertyCode != null && !propertyCode.isEmpty();
+
+        if (hasC3 && hasProperty) {
+            if (title != null && !title.isEmpty()) {
+                scenicSpots = scenicSpotRepository.findByTitleContainingAndTag3CodeAndPropertyCode(title, c3Code, propertyCode);
             } else {
-                // 无效的标签编码
-                return ResponseResult.error(400, null);
+                scenicSpots = scenicSpotRepository.findByTag3CodeAndPropertyCode(c3Code, propertyCode);
             }
-        } else if (tagCode != null) {
-            // 按标签查询
-            if (tagCode.startsWith("C1_")) {
-                // 一级标签
-                Integer id = Integer.parseInt(tagCode.substring(3));
-                scenicSpots = scenicSpotRepository.findByC1Id(id);
-            } else if (tagCode.startsWith("C2_")) {
-                // 二级标签
-                Integer id = Integer.parseInt(tagCode.substring(3));
-                scenicSpots = scenicSpotRepository.findByC2Id(id);
-            } else if (tagCode.startsWith("C3_")) {
-                // 三级标签
-                scenicSpots = scenicSpotRepository.findByTag3Code(tagCode);
-            } else if (tagCode.startsWith("P_")) {
-                // 属性标签
-                scenicSpots = scenicSpotRepository.findByPropertyCode(tagCode);
+        } else if (hasC3) {
+            if (title != null && !title.isEmpty()) {
+                scenicSpots = scenicSpotRepository.findByTitleContainingAndTag3Code(title, c3Code);
             } else {
-                // 无效的标签编码
-                return ResponseResult.error(400, null);
+                scenicSpots = scenicSpotRepository.findByTag3Code(c3Code);
             }
-        } else if (title != null) {
-            // 按标题查询
+        } else if (hasProperty) {
+            if (title != null && !title.isEmpty()) {
+                scenicSpots = scenicSpotRepository.findByTitleContainingAndPropertyCode(title, propertyCode);
+            } else {
+                scenicSpots = scenicSpotRepository.findByPropertyCode(propertyCode);
+            }
+        } else if (tagCode != null && !tagCode.isEmpty()) {
+            if (title != null && !title.isEmpty()) {
+                if (tagCode.startsWith("C1_")) {
+                    Integer id = Integer.parseInt(tagCode.substring(3));
+                    scenicSpots = scenicSpotRepository.findByTitleContainingAndC1Id(title, id);
+                } else if (tagCode.startsWith("C2_")) {
+                    Integer id = Integer.parseInt(tagCode.substring(3));
+                    scenicSpots = scenicSpotRepository.findByTitleContainingAndC2Id(title, id);
+                } else {
+                    return ResponseResult.error(400, null);
+                }
+            } else {
+                if (tagCode.startsWith("C1_")) {
+                    Integer id = Integer.parseInt(tagCode.substring(3));
+                    scenicSpots = scenicSpotRepository.findByC1Id(id);
+                } else if (tagCode.startsWith("C2_")) {
+                    Integer id = Integer.parseInt(tagCode.substring(3));
+                    scenicSpots = scenicSpotRepository.findByC2Id(id);
+                } else {
+                    return ResponseResult.error(400, null);
+                }
+            }
+        } else if (title != null && !title.isEmpty()) {
             scenicSpots = scenicSpotRepository.findByTitleContaining(title);
         } else {
-            // 查询所有
             scenicSpots = scenicSpotRepository.findAll();
         }
 

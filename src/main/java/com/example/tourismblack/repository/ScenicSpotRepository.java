@@ -65,4 +65,14 @@ public interface ScenicSpotRepository extends JpaRepository<ScenicSpot, Integer>
         @Query(value = "SELECT DISTINCT s.* FROM scenic_spots s JOIN scenic_tag_property stp ON s.id = stp.scenic_id WHERE s.title LIKE %:title% AND stp.property_code = :propertyCode", nativeQuery = true)
         List<ScenicSpot> findByTitleContainingAndPropertyCode(@Param("title") String title,
                         @Param("propertyCode") String propertyCode);
+
+        // 通过三级标签code和属性标签code搜索景点
+        @Query(value = "SELECT DISTINCT s.* FROM scenic_spots s JOIN scenic_tag3 st3 ON s.id = st3.scenic_id JOIN scenic_tag_property stp ON s.id = stp.scenic_id WHERE st3.tag3_code = :tag3Code AND stp.property_code = :propertyCode", nativeQuery = true)
+        List<ScenicSpot> findByTag3CodeAndPropertyCode(@Param("tag3Code") String tag3Code,
+                        @Param("propertyCode") String propertyCode);
+
+        // 通过标题、三级标签code和属性标签code搜索景点
+        @Query(value = "SELECT DISTINCT s.* FROM scenic_spots s JOIN scenic_tag3 st3 ON s.id = st3.scenic_id JOIN scenic_tag_property stp ON s.id = stp.scenic_id WHERE s.title LIKE %:title% AND st3.tag3_code = :tag3Code AND stp.property_code = :propertyCode", nativeQuery = true)
+        List<ScenicSpot> findByTitleContainingAndTag3CodeAndPropertyCode(@Param("title") String title,
+                        @Param("tag3Code") String tag3Code, @Param("propertyCode") String propertyCode);
 }
