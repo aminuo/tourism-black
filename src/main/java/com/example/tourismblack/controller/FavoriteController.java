@@ -105,6 +105,15 @@ public class FavoriteController {
             favorite.setScenicSpot(scenicSpot);
             favoriteRepository.save(favorite);
 
+            // 增加收藏量
+            if (scenicSpot.getCollectCount() == null) {
+                scenicSpot.setCollectCount(0);
+            }
+            scenicSpot.setCollectCount(scenicSpot.getCollectCount() + 1);
+            // 更新热度指标
+            scenicSpot.updateHotMetrics();
+            scenicSpotRepository.save(scenicSpot);
+
             // 返回成功信息
             Map<String, Object> result = new HashMap<>();
             result.put("message", "收藏成功");
@@ -170,6 +179,14 @@ public class FavoriteController {
 
             // 删除收藏记录
             favoriteRepository.delete(favorite);
+
+            // 减少收藏量
+            if (scenicSpot.getCollectCount() != null && scenicSpot.getCollectCount() > 0) {
+                scenicSpot.setCollectCount(scenicSpot.getCollectCount() - 1);
+                // 更新热度指标
+                scenicSpot.updateHotMetrics();
+                scenicSpotRepository.save(scenicSpot);
+            }
 
             // 返回成功信息
             Map<String, Object> result = new HashMap<>();
@@ -245,6 +262,7 @@ public class FavoriteController {
         result.put("introduce", scenicSpot.getIntroduce());
         result.put("address", scenicSpot.getAddress());
         result.put("times", scenicSpot.getTimes());
+        result.put("hotStatus", scenicSpot.getHotStatus());
 
         // 合并标签（三级标签和属性标签）
         List<Map<String, Object>> tagsList = new ArrayList<>();

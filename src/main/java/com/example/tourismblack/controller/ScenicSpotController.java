@@ -171,7 +171,16 @@ public class ScenicSpotController {
     public ResponseResult<Map<String, Object>> getScenicSpotById(@PathVariable Integer id) {
         Optional<ScenicSpot> optionalScenicSpot = scenicSpotRepository.findById(id);
         if (optionalScenicSpot.isPresent()) {
-            return ResponseResult.success(buildScenicSpotWithTags(optionalScenicSpot.get()));
+            ScenicSpot scenicSpot = optionalScenicSpot.get();
+            // 增加浏览量
+            if (scenicSpot.getViewCount() == null) {
+                scenicSpot.setViewCount(0);
+            }
+            scenicSpot.setViewCount(scenicSpot.getViewCount() + 1);
+            // 更新热度指标
+            scenicSpot.updateHotMetrics();
+            scenicSpotRepository.save(scenicSpot);
+            return ResponseResult.success(buildScenicSpotWithTags(scenicSpot));
         } else {
             return ResponseResult.error(404, null);
         }
@@ -192,6 +201,7 @@ public class ScenicSpotController {
         result.put("introduce", scenicSpot.getIntroduce());
         result.put("address", scenicSpot.getAddress());
         result.put("times", scenicSpot.getTimes());
+        result.put("hotStatus", scenicSpot.getHotStatus());
 
         // 合并标签（三级标签和属性标签）
         List<Map<String, Object>> tagsList = new ArrayList<>();

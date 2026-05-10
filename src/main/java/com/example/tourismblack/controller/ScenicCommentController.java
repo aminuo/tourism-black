@@ -2,8 +2,10 @@ package com.example.tourismblack.controller;
 
 import com.example.tourismblack.common.ResponseResult;
 import com.example.tourismblack.entity.ScenicComment;
+import com.example.tourismblack.entity.ScenicSpot;
 import com.example.tourismblack.entity.User;
 import com.example.tourismblack.repository.ScenicCommentRepository;
+import com.example.tourismblack.repository.ScenicSpotRepository;
 import com.example.tourismblack.repository.UserRepository;
 import com.example.tourismblack.utils.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class ScenicCommentController {
 
     @Autowired
     private ScenicCommentRepository scenicCommentRepository;
+
+    @Autowired
+    private ScenicSpotRepository scenicSpotRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -66,6 +71,16 @@ public class ScenicCommentController {
             // comment.setStatus(0); // 0=待审核，1=已通过，2=已驳回（暂时注释，以后可能有用）
 
             scenicCommentRepository.save(comment);
+
+            // 更新景点的评论数和热度指标
+            scenicSpotRepository.findById(scenicId).ifPresent(scenicSpot -> {
+                if (scenicSpot.getCommentCount() == null) {
+                    scenicSpot.setCommentCount(0);
+                }
+                scenicSpot.setCommentCount(scenicSpot.getCommentCount() + 1);
+                scenicSpot.updateHotMetrics();
+                scenicSpotRepository.save(scenicSpot);
+            });
 
             Map<String, Object> result = new HashMap<>();
             result.put("message", "评论提交成功");
