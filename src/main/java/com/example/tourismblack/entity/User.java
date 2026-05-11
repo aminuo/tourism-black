@@ -20,6 +20,9 @@ public class User {
     private String avatarUrl;
     @Column(name = "nick_name")
     private String nickName;
+    private Integer gender;
+    private String phone;
+    private String email;
 
     public Integer getId() {
         return id;
@@ -77,6 +80,30 @@ public class User {
         this.nickName = nickName;
     }
 
+    public Integer getGender() {
+        return gender;
+    }
+
+    public void setGender(Integer gender) {
+        this.gender = gender;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -87,6 +114,9 @@ public class User {
                 ", updateTime=" + updateTime +
                 ", avatarUrl='" + avatarUrl + '\'' +
                 ", nickName='" + nickName + '\'' +
+                ", gender=" + gender +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
                 '}';
     }
 }

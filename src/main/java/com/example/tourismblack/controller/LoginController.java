@@ -124,6 +124,9 @@ public class LoginController {
             result.put("openid", user.getOpenid());
             result.put("avatarUrl", user.getAvatarUrl());
             result.put("nickName", user.getNickName());
+            result.put("gender", user.getGender());
+            result.put("phone", user.getPhone());
+            result.put("email", user.getEmail());
 
             return ResponseResult.success(result);
         } catch (Exception e) {
@@ -136,7 +139,7 @@ public class LoginController {
 
     @PostMapping("/updateUserInfo")
     public ResponseResult<Map<String, Object>> updateUserInfo(@RequestHeader("token") String token,
-            @RequestBody Map<String, String> request) {
+            @RequestBody Map<String, Object> request) {
         try {
             // 验证token
             if (!JWTUtil.validateToken(token)) {
@@ -163,10 +166,19 @@ public class LoginController {
 
             // 更新用户信息
             if (request.containsKey("avatarUrl")) {
-                user.setAvatarUrl(request.get("avatarUrl"));
+                user.setAvatarUrl((String) request.get("avatarUrl"));
             }
             if (request.containsKey("nickName")) {
-                user.setNickName(request.get("nickName"));
+                user.setNickName((String) request.get("nickName"));
+            }
+            if (request.containsKey("gender")) {
+                user.setGender((Integer) request.get("gender"));
+            }
+            if (request.containsKey("phone")) {
+                user.setPhone((String) request.get("phone"));
+            }
+            if (request.containsKey("email")) {
+                user.setEmail((String) request.get("email"));
             }
 
             // 保存更新后的用户信息
@@ -178,6 +190,9 @@ public class LoginController {
             result.put("openid", user.getOpenid());
             result.put("avatarUrl", user.getAvatarUrl());
             result.put("nickName", user.getNickName());
+            result.put("gender", user.getGender());
+            result.put("phone", user.getPhone());
+            result.put("email", user.getEmail());
 
             return ResponseResult.success(result);
         } catch (Exception e) {
