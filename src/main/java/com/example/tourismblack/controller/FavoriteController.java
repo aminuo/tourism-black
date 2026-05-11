@@ -13,6 +13,7 @@ import com.example.tourismblack.repository.ScenicTagPropertyRepository;
 import com.example.tourismblack.repository.TagCategory3Repository;
 import com.example.tourismblack.repository.TagPropertyRepository;
 import com.example.tourismblack.repository.UserRepository;
+import com.example.tourismblack.service.UserTagPreferenceService;
 import com.example.tourismblack.utils.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +49,9 @@ public class FavoriteController {
 
     @Autowired
     private TagPropertyRepository tagPropertyRepository;
+
+    @Autowired
+    private UserTagPreferenceService userTagPreferenceService;
 
     // 添加收藏
     @PostMapping("/addFavorite")
@@ -113,6 +117,9 @@ public class FavoriteController {
             // 更新热度指标
             scenicSpot.updateHotMetrics();
             scenicSpotRepository.save(scenicSpot);
+
+            // 更新用户标签偏好（收藏行为）
+            userTagPreferenceService.updatePreferencesOnCollect(user.getId(), scenicSpotId, true);
 
             // 返回成功信息
             Map<String, Object> result = new HashMap<>();
@@ -187,6 +194,9 @@ public class FavoriteController {
                 scenicSpot.updateHotMetrics();
                 scenicSpotRepository.save(scenicSpot);
             }
+
+            // 更新用户标签偏好（取消收藏行为）
+            userTagPreferenceService.updatePreferencesOnCollect(user.getId(), scenicSpotId, false);
 
             // 返回成功信息
             Map<String, Object> result = new HashMap<>();
