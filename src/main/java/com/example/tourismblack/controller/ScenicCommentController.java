@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -140,10 +141,69 @@ public class ScenicCommentController {
                     commentMap.put("nickName", null);
                 }
 
+                ScenicSpot scenicSpot = scenicSpotRepository.findById(comment.getScenicId()).orElse(null);
+                if (scenicSpot != null) {
+                    commentMap.put("scenicName", scenicSpot.getTitle());
+                } else {
+                    commentMap.put("scenicName", null);
+                }
+
                 resultList.add(commentMap);
             }
 
             return ResponseResult.success(resultList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseResult.error(500, null);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseResult<Map<String, Object>> deleteScenicComment(
+            @RequestHeader("token") String token,
+            @PathVariable Integer id) {
+        try {
+            if (!JWTUtil.validateToken(token)) {
+                return ResponseResult.error(401, null);
+            }
+
+            String openid = JWTUtil.getOpenidFromToken(token);
+            if (openid == null) {
+                return ResponseResult.error(401, null);
+            }
+
+            User user = userRepository.findByOpenid(openid);
+            if (user == null) {
+                return ResponseResult.error(404, null);
+            }
+
+            Optional<ScenicComment> optionalComment = scenicCommentRepository.findById(id);
+            if (!optionalComment.isPresent()) {
+                return ResponseResult.error(404, null);
+            }
+
+            ScenicComment comment = optionalComment.get();
+            if (!comment.getUserId().equals(user.getId())) {
+                return ResponseResult.error(403, null);
+            }
+
+            Integer scenicId = comment.getScenicId();
+            scenicCommentRepository.delete(comment);
+
+            // 更新景点的评论数和热度指标
+            scenicSpotRepository.findById(scenicId).ifPresent(scenicSpot -> {
+                if (scenicSpot.getCommentCount() != null && scenicSpot.getCommentCount() > 0) {
+                    scenicSpot.setCommentCount(scenicSpot.getCommentCount() - 1);
+                } else {
+                    scenicSpot.setCommentCount(0);
+                }
+                scenicSpot.updateHotMetrics();
+                scenicSpotRepository.save(scenicSpot);
+            });
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("message", "评论删除成功");
+            return ResponseResult.success(result);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseResult.error(500, null);
